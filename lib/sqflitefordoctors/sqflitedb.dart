@@ -25,6 +25,21 @@ class SqfliteDatabase{
         doctor.toMap());
     return id;
   }
+
+  static Future<int> updateDoctor(Doctor doctor) async{
+    final db=await SqfliteDatabase.databasedoctors();
+  int i=  await db.update("doctors", doctor.toMap(),
+     where: 'id = ?',
+    whereArgs: [doctor.id]);
+   return i;
+  }
+
+static Future<void> deleteDoctor(int id) async{
+    final db = await SqfliteDatabase.databasedoctors();
+    await db.delete("doctors",
+    where: 'id = ?',
+    whereArgs: [id]);
+}
   static Future<List<Doctor>> getAllDoctors() async{
     final db= await SqfliteDatabase.databasedoctors();
      List<Map<String,Object?>> doctorsInfo=

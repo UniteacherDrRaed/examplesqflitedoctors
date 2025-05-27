@@ -28,6 +28,21 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  updateDoctor(int id) async{
+    int i=await SqfliteDatabase.updateDoctor(
+      Doctor(id:id,name: nameController.text,
+          address: addressController.text)
+    );
+
+    print("current i is $i");
+    fetchListDoctors();
+  }
+
+  deleteDoctor(int id) async{
+    await SqfliteDatabase.deleteDoctor(id);
+    fetchListDoctors();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -96,6 +111,45 @@ class _MainPageState extends State<MainPage> {
                   Doctor currentDoctor = listDoctors[index];
                   return Card(
                     child: ListTile(
+                      onLongPress: (){
+                        nameController.text=currentDoctor.name;
+                        addressController.text=currentDoctor.address;
+                        int currentId=currentDoctor.id!;
+                        showDialog(context: context,
+                            builder: (context){
+                          return AlertDialog(
+                            title: Text("doctor info"),
+                            content: Column(
+                              children: [
+                                TextField(
+                                  controller: nameController,
+                                ),
+                                TextField(
+                                  controller: addressController,
+                                )
+                              ],
+                            ),
+                            actions: [
+                              TextButton(onPressed: (){
+                                updateDoctor(currentId);
+                                addressController.clear();
+                                nameController.clear();
+                                Navigator.of(context).pop();
+                              },
+                                  child: Text("update")),
+                              TextButton(onPressed: (){
+                                Navigator.of(context).pop();
+                              },
+                                  child: Text("cancel"))
+                            ],
+                          );
+                            });
+                      },
+                      trailing: IconButton(onPressed: (){
+                        int currentId=currentDoctor.id!;
+                        deleteDoctor(currentId);
+                      },
+                          icon: Icon(Icons.delete)),
                       leading: Text("${currentDoctor.id}"),
                       title: Text(currentDoctor.name),
                       subtitle: Text(currentDoctor.address),
